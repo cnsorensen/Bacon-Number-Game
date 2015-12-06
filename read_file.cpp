@@ -3,8 +3,9 @@
 #include <stdio.h>
 #include <string>
 #include <fstream>
-//#include <regex>
 #include <vector>
+//#include <iterator>
+#include <unordered_map>
 
 using namespace std;
 
@@ -14,57 +15,72 @@ int main( int argc, char** argv )
 
     fin.open( argv[1], ios::in );
 
-    vector<string> seglist;
     vector<string> movies;
     vector<string> actors;
+    vector<string> lines;
 
     int flag = 0;
 
+/***************/
+    size_t it1;
+    std::size_t it2;
+    string del = "/";
+    std::size_t pos;
+    string s2;
+/*****************/
+
     string x;
+    // push all lines in file into vector
     while( !fin.eof()  )
     {
-        getline( fin, x, '/' );
-        seglist.push_back(x);
-        if( flag == 0 )
+        getline( fin, x );
+        lines.push_back( x );        
+    }
+    
+    for( int i = 0; i < lines.size(); i++ )
+    {
+        string line = lines[i];
+        //string del = "/";
+        int flag = 0;
+        for( it1 = 0; it1 < line.size(); it1 = it2 + 1 )
         {
-            movies.push_back(x);
-            flag = 1;
-        }
-        if( flag == 1 )
-        {
-            actors.push_back(x);
-            flag = 0;
+            it2 = line.find( del, it1 );    
+            if( it2 != string::npos )
+            {
+                s2 = line.substr( it1, it2-it1 );
+                if( flag == 0 )
+                {
+                    //movies.push_back( line.substr( it1, it2-1 ) );
+                    movies.push_back( s2 );
+                    flag = 1;
+                }
+                else
+                {
+                    //actors.push_back( line.substr( it1, it2 ) );
+                    actors.push_back( s2 );
+                }
+            }
+            else
+            {
+                s2 = line.substr( it1, line.size() );
+                actors.push_back(s2);
+                break;
+            }
         }
     }
 
-    cout << "seglist" << endl;
-    for( vector<string>::const_iterator i = seglist.begin(); i != seglist.end(); i++ )
-        cout << *i << endl;
-
-
-    /*for( vector<string>::const_iterator i = seglist.begin(); i != seglist.end(); i++ )
-    {
-        cout << "i: " << *i << endl;
-        if( *i == "1" )
-        {
-            i++;
-            movies.push_back( *i );
-        }
-        else
-            actors.push_back( *i );
-    }*/
-
-//    cout << "seglist" << endl;
-//    for( vector<string>::const_iterator i = seglist.begin(); i != seglist.end(); i++ )
-//        cout << *i << endl;
-
-    cout << "movies" << endl;
+    cout << endl << "movies" << endl;
     for( vector<string>::const_iterator i = movies.begin(); i != movies.end(); i++ )
         cout << *i << endl;
 
-    cout << "actors" << endl;
+    cout << endl << "actors" << endl;
     for( vector<string>::const_iterator i = actors.begin(); i != actors.end(); i++ )
         cout << *i << endl;
+
+    fin.close();
+/////////////////////////////////////////////////////////////
+
+
 
     return 1;
 }
