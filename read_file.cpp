@@ -73,19 +73,25 @@ int main( int argc, char** argv )
                     //actors.push_back( line.substr( it1, it2 ) );
                     actors.push_back( s2 );
                     currentActor = s2;
-                    movieHash[currentMovie].push_back(s2); 
+                    actorHash[currentMovie].push_back(s2); 
                 }
             }
             else
             {
                 s2 = line.substr( it1, line.size() );
                 actors.push_back(s2);
-                movieHash[currentMovie].push_back(s2);
+                actorHash[currentMovie].push_back(s2);
                 break;
             }
         }
     }
 
+    auto z = actorHash["Stone, Emma"];
+    //cout << z -> first << endl;
+    //cout << actorHash["Stone, Emma"] << endl;
+    //cout << z->first << z->second << endl;
+    //cout << actorHash["Stone, Emma"][0] << endl;
+    cout << z[0] << endl;
     cout << endl << "movies" << endl;
     for( vector<string>::const_iterator i = movies.begin(); i != movies.end(); i++ )
         cout << *i << endl;

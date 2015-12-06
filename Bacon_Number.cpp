@@ -1,4 +1,6 @@
 /*Bacon_Number*/
+
+// includes
 #include <iostream>
 #include <stdlib.h>
 #include <stdio.h>
@@ -7,9 +9,7 @@
 #include <unordered_map>
 #include <vector>
 #include <fstream>
-
-//Debugging includes
-#include <typeinfo>
+#include <queue>
 
 using namespace std;
 
@@ -19,6 +19,7 @@ typedef std::unordered_map<std::string,std::string> stringmap;
 // function prototypes
 void Read_File( string, stringmap, stringmap, stringmap );
 void Bacon_Number( string );
+void BFS( string );
 
 // globals
 struct graphVertex
@@ -57,8 +58,9 @@ int main( int argc, char** argv )
     stringmap verticies;
 
     Read_File( fileName, movies, actors, verticies );
+    BFS( actor );
  
-    Bacon_Number( actor );
+//    Bacon_Number( actor );
 
     return 1;
 }
@@ -209,11 +211,14 @@ void Read_File( string fileName, stringmap movies, stringmap actors, stringmap v
     }
 
     cout << endl << "actorHash" << endl;
+    // each item in actorHash
     for( unsigned int i = 0; i < actorHash.bucket_count(); i++ )
     {
+        // each actor
         for( auto local_it2 = actorHash.begin(i); local_it2 != actorHash.end(i); local_it2++ )
         {
             cout << endl << "actor: " << local_it2 -> first << endl;
+            // each movie actor did
             for( unsigned int j = 0; j < local_it2 -> second.size(); j++ )
             {
                 cout << local_it2 -> second[j] << endl;
@@ -234,3 +239,44 @@ void Read_File( string fileName, stringmap movies, stringmap actors, stringmap v
 
     return;
 }
+
+void BFS( string v )
+{
+    string x;   //movie
+    string w;   //actor
+    string y;   //actor
+
+    queue<string> q;
+    graphHash[v].visited = true;
+    q.push( v );
+    
+    while( !q.empty() )
+    {
+        w = q.front();
+        q.pop();
+        // set all the stuff to their stuff in the graph hash
+        
+        // for each movie x that actor w is in
+        auto it = actorHash[w];
+        for( unsigned int i = 0; x < it = actorHash[w].size(); i++ )
+        {
+            /*x = actorHash[w] -> second[i];
+            // for each actor y in movie x
+            for( unsigned int j = 0; y < movieHash[x] -> second.size(); j++ )
+            {
+                y = movieHash[j] -> second[j];
+                if( graphHash[y] -> second.visited != true )
+                {
+                    graphHash[y] -> second.visited = true;
+                    graphHash[y] -> second.parent = w;
+                    graphHash[y] -> second.DOS = graphHash[w] + 1;
+                    q.push( y );
+                }
+            }*/
+            cout << "hi" << endl;
+        }
+    }
+
+    return;
+}
+
