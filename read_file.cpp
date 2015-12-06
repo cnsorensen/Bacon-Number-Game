@@ -11,6 +11,12 @@ using namespace std;
 
 int main( int argc, char** argv )
 {
+    if( argc != 2 )
+    {
+        cout << "you fucked up" << endl;
+        exit(0);
+    }
+
     ifstream fin;    
 
     fin.open( argv[1], ios::in );
@@ -18,18 +24,24 @@ int main( int argc, char** argv )
     vector<string> movies;
     vector<string> actors;
     vector<string> lines;
+    vector<string> currentMovieActors;
+    vector<string> currentActorMovies;
 
     int flag = 0;
 
 /***************/
     size_t it1;
-    std::size_t it2;
+    size_t it2;
     string del = "/";
-    std::size_t pos;
     string s2;
+    string x;
+    string currentActor;
+    string currentMovie;
 /*****************/
 
-    string x;
+    unordered_map<string, vector<string>> movieHash;
+    unordered_map<string, vector<string>> actorHash;
+
     // push all lines in file into vector
     while( !fin.eof()  )
     {
@@ -53,17 +65,22 @@ int main( int argc, char** argv )
                     //movies.push_back( line.substr( it1, it2-1 ) );
                     movies.push_back( s2 );
                     flag = 1;
+                    currentMovie = s2;
+                    movieHash.emplace( currentMovie,vector<string>() ); 
                 }
                 else
                 {
                     //actors.push_back( line.substr( it1, it2 ) );
                     actors.push_back( s2 );
+                    currentActor = s2;
+                    movieHash[currentMovie].push_back(s2); 
                 }
             }
             else
             {
                 s2 = line.substr( it1, line.size() );
                 actors.push_back(s2);
+                movieHash[currentMovie].push_back(s2);
                 break;
             }
         }
@@ -76,6 +93,19 @@ int main( int argc, char** argv )
     cout << endl << "actors" << endl;
     for( vector<string>::const_iterator i = actors.begin(); i != actors.end(); i++ )
         cout << *i << endl;
+
+    cout << endl << "movieHash" << endl;
+    for( unsigned int i = 0; i < movieHash.bucket_count(); i++ )
+    {
+        for( auto local_it = movieHash.begin(i); local_it != movieHash.end(i); local_it++ )
+        {
+            cout << local_it -> first << endl;
+            for( int j = 0; j < local_it -> second.size(); j++ )
+            {
+                cout << local_it -> second[j] << endl;
+            }
+        }
+    }
 
     fin.close();
 /////////////////////////////////////////////////////////////

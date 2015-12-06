@@ -28,6 +28,9 @@ struct vertex
     bool visited = false;
 };
 
+unordered_map<string, vector<string>> movieHash;
+unordered_map<string, vector<string>> actorHash; 
+
 int main( int argc, char** argv )
 {
     string actor = "Bacon, Kevin";
@@ -79,6 +82,8 @@ void Read_File( string fileName, stringmap movies, stringmap actors, stringmap v
     size_t it2;
     string del = "/";
     string s;
+    string currentActor;
+    string currentMovie;
 
     // open movie database file
     fin.open( fileName, ios::in );
@@ -93,6 +98,8 @@ void Read_File( string fileName, stringmap movies, stringmap actors, stringmap v
     for( unsigned int i = 0; i < lines.size(); i++ )
     {
         line = lines[i];
+        
+        // toggle flag to count first item as a movie
         flag = 0;
 
         // in the line, grab each movie and actor              
@@ -107,19 +114,63 @@ void Read_File( string fileName, stringmap movies, stringmap actors, stringmap v
                 s = line.substr( it1, it2-it1 );
                 if( flag == 0 )
                 {
-                    movieList.push_back( s );
+                    // set the current movie being looked at
+                    currentMovie = s;
+
+                    // add to the list of movies
+                    movieList.push_back( currentMovie );
+
+                    // create an element in the movie hash table for current movie
+                    movieHash.emplace( currentMovie, vector<string>() );
+                    
+                    // toggle the flag to count item as actors now
                     flag = 1;
                 }
                 else
-                {
+                {   
+                    // set the current actor being looked at
+                    currentActor = s;
+
+                    // push into the list of actors
                     actorList.push_back( s );
+
+                    // add actor to the corresponding movie
+                    movieHash[currentMovie].push_back( s );
+
+                    // check to see if the actor is in the actor hash table
+                    if( actorHash.find( currentActor ) == actorHash.end() )
+                    {
+                        // if it isn't, add actor to hash table
+                        actorHash.emplace( currentActor, vector<string>() );
+                    }
+
+                    // add movie to the corresponding actor
+                    actorHash[currentActor].push_back( currentMovie );
                 }
             }
             else
             {
                 // add the last actor
                 s = line.substr( it1, line.size() );
+                
+                // set the current actor being looked at
+                currentActor = s;
+
+                // push into the list of actors
                 actorList.push_back( s );
+
+                // add actor to the current movie
+                movieHash[currentMovie].push_back( s );
+                
+                // check to see if actor is in the hash table
+                if( actorHash.find( currentActor ) == actorHash.end() )
+                {
+                    // if it isn't, add actor to hash table
+                    actorHash.emplace( currentActor, vector<string>() );
+                }
+                
+                // add current movie to the actor
+                actorHash[currentActor].push_back( currentMovie );
                 break;
             }
         }
@@ -127,6 +178,7 @@ void Read_File( string fileName, stringmap movies, stringmap actors, stringmap v
 
     fin.close();
 
+/////////////////////
     cout << endl << "movies" << endl;
     for( vector<string>::const_iterator i = movieList.begin(); i != movieList.end(); i++ )
         cout << *i << endl;
@@ -134,6 +186,33 @@ void Read_File( string fileName, stringmap movies, stringmap actors, stringmap v
     cout << endl << "actors" << endl;
     for( vector<string>::const_iterator i = actorList.begin(); i != actorList.end(); i++ )
         cout << *i << endl;
+
+    cout << endl << "movieHash" << endl;
+    for( unsigned int i = 0; i < movieHash.bucket_count(); i++ )
+    {
+        for( auto local_it = movieHash.begin(i); local_it != movieHash.end(i); local_it++ )
+        {
+            cout << endl << "movie: " << local_it -> first << endl;
+            for( unsigned int j = 0; j < local_it -> second.size(); j++ )
+            {
+                cout << local_it -> second[j] << endl;
+            }
+        }
+    }
+
+    cout << endl << "actorHash" << endl;
+    for( unsigned int i = 0; i < actorHash.bucket_count(); i++ )
+    {
+        for( auto local_it2 = actorHash.begin(i); local_it2 != actorHash.end(i); local_it2++ )
+        {
+            cout << endl << "actor: " << local_it2 -> first << endl;
+            for( unsigned int j = 0; j < local_it2 -> second.size(); j++ )
+            {
+                cout << local_it2 -> second[j] << endl;
+            }
+        }
+    }
+
 
 
     return;
