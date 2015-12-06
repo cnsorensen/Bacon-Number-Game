@@ -21,15 +21,17 @@ void Read_File( string, stringmap, stringmap, stringmap );
 void Bacon_Number( string );
 
 // globals
-struct vertex
+struct graphVertex
 {
     int DOS = 0;
-    string parent = "";
+    string parent = "orphan";
     bool visited = false;
 };
 
+// hash tables
 unordered_map<string, vector<string>> movieHash;
 unordered_map<string, vector<string>> actorHash; 
+unordered_map<string, graphVertex> graphHash;
 
 int main( int argc, char** argv )
 {
@@ -142,6 +144,9 @@ void Read_File( string fileName, stringmap movies, stringmap actors, stringmap v
                     {
                         // if it isn't, add actor to hash table
                         actorHash.emplace( currentActor, vector<string>() );
+                        
+                        // insert actor into graph
+                        graphHash.emplace( currentActor, graphVertex() );
                     }
 
                     // add movie to the corresponding actor
@@ -167,6 +172,9 @@ void Read_File( string fileName, stringmap movies, stringmap actors, stringmap v
                 {
                     // if it isn't, add actor to hash table
                     actorHash.emplace( currentActor, vector<string>() );
+            
+                    // insert into graph
+                    graphHash.emplace( currentActor, graphVertex() );
                 }
                 
                 // add current movie to the actor
@@ -213,6 +221,15 @@ void Read_File( string fileName, stringmap movies, stringmap actors, stringmap v
         }
     }
 
+    cout << endl << "graph hash" << endl;
+    for( unsigned int i = 0; i < graphHash.bucket_count(); i++ )
+    {
+        for( auto local_it3 = graphHash.begin(i); local_it3 != graphHash.end(i); local_it3++ )
+        {
+            cout << endl << "actor: " << local_it3 -> first << endl;
+            cout << local_it3 -> second.DOS << " " << local_it3 -> second.parent << " " << local_it3 -> second.visited; 
+        }
+    }
 
 
     return;
