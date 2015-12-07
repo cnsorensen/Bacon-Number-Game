@@ -26,6 +26,7 @@ struct graphVertex
 {
     int DOS = 0;
     string parent = "orphan";
+    string parentMovie = "The Orphan";
     bool visited = false;
 };
 
@@ -289,6 +290,7 @@ void BFS( string v )
                     currentVertex -> second.visited = true;
                     currentVertex -> second.parent = w_s;
                     currentVertex -> second.DOS = parentVertex -> second.DOS + 1;
+                    currentVertex -> second.parentMovie = x_s;
                     q.push( y_s );
                     cout << "New: " << y_s << endl;
                 }
