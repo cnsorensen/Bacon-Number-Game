@@ -86,13 +86,16 @@ int main( int argc, char** argv )
         }
     }
 
-    auto z = actorHash["Stone, Emma"];
+    //auto z = actorHash["Stone, Emma"];
     //cout << z -> first << endl;
     //cout << actorHash["Stone, Emma"] << endl;
     //cout << z->first << z->second << endl;
     //cout << actorHash["Stone, Emma"][0] << endl;
-    cout << z[0] << endl;
-    cout << endl << "movies" << endl;
+    //cout << z[0] << endl;
+    //cout << endl << "movies" << endl;
+    
+    //string z = actorHash["Stone, Emma"][0];
+     
     for( vector<string>::const_iterator i = movies.begin(); i != movies.end(); i++ )
         cout << *i << endl;
 
@@ -112,6 +115,14 @@ int main( int argc, char** argv )
             }
         }
     }
+
+    cout << "Here we go" << endl;
+    auto iter = movieHash.find("Perks (2012)");
+    if( iter != movieHash.end() )
+        //cout << iter->second[0] << endl;
+        cout << iter -> first << endl;
+    else
+        cout << "Not in here bitch!!" << endl;
 
     fin.close();
 /////////////////////////////////////////////////////////////

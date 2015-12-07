@@ -58,7 +58,7 @@ int main( int argc, char** argv )
     stringmap verticies;
 
     Read_File( fileName, movies, actors, verticies );
-    BFS( actor );
+    BFS( "Nord, Scot" );
  
 //    Bacon_Number( actor );
 
@@ -189,6 +189,7 @@ void Read_File( string fileName, stringmap movies, stringmap actors, stringmap v
     fin.close();
 
 /////////////////////
+/*
     cout << endl << "movies" << endl;
     for( vector<string>::const_iterator i = movieList.begin(); i != movieList.end(); i++ )
         cout << *i << endl;
@@ -209,7 +210,8 @@ void Read_File( string fileName, stringmap movies, stringmap actors, stringmap v
             }
         }
     }
-
+*/
+/*
     cout << endl << "actorHash" << endl;
     // each item in actorHash
     for( unsigned int i = 0; i < actorHash.bucket_count(); i++ )
@@ -225,7 +227,8 @@ void Read_File( string fileName, stringmap movies, stringmap actors, stringmap v
             }
         }
     }
-
+*/
+/*
     cout << endl << "graph hash" << endl;
     for( unsigned int i = 0; i < graphHash.bucket_count(); i++ )
     {
@@ -235,45 +238,93 @@ void Read_File( string fileName, stringmap movies, stringmap actors, stringmap v
             cout << local_it3 -> second.DOS << " " << local_it3 -> second.parent << " " << local_it3 -> second.visited; 
         }
     }
-
+*/
 
     return;
 }
 
 void BFS( string v )
 {
-    string x;   //movie
-    string w;   //actor
-    string y;   //actor
+    string x_s;   //movie
+    string w_s;   //actor
+    string y_s;   //actor
 
     queue<string> q;
-    graphHash[v].visited = true;
     q.push( v );
-    
+
+    auto v_g = graphHash.find( v );
+    v_g -> second.DOS = 0;
+    v_g -> second.parent = "";
+    v_g -> second.visited = true;
+
     while( !q.empty() )
     {
-        w = q.front();
+        w_s = q.front();
         q.pop();
-        // set all the stuff to their stuff in the graph hash
-        
+        // set all the stuff to their stuff in the graph hash       
+        auto w_i = actorHash.find( w_s );
+
+        cout << "Current: " << w_s << endl;
+
         // for each movie x that actor w is in
-        auto it = actorHash[w];
-        for( unsigned int i = 0; x < it = actorHash[w].size(); i++ )
+        for( unsigned int i = 0; i < w_i -> second.size(); i++ )
         {
-            /*x = actorHash[w] -> second[i];
+            x_s = w_i -> second[i];
+            auto x_i = movieHash.find( x_s );
+
+            cout << "For movie: " << x_s << endl;
+
             // for each actor y in movie x
-            for( unsigned int j = 0; y < movieHash[x] -> second.size(); j++ )
+            for( unsigned int j = 0; j < x_i -> second.size(); j++ )
             {
-                y = movieHash[j] -> second[j];
-                if( graphHash[y] -> second.visited != true )
+                y_s = x_i -> second[j];
+                auto y_i = actorHash.find( y_s );
+                auto currentVertex = graphHash.find( y_s );
+                
+                cout << "For actor: " << y_s << endl;
+    
+                if( currentVertex -> second.visited != true )
                 {
-                    graphHash[y] -> second.visited = true;
-                    graphHash[y] -> second.parent = w;
-                    graphHash[y] -> second.DOS = graphHash[w] + 1;
-                    q.push( y );
+                    auto parentVertex = graphHash.find( w_s );
+                    currentVertex -> second.visited = true;
+                    currentVertex -> second.parent = w_s;
+                    currentVertex -> second.DOS = parentVertex -> second.DOS + 1;
+                    q.push( y_s );
+                    cout << "New: " << y_s << endl;
                 }
-            }*/
-            cout << "hi" << endl;
+            }
+        }
+    }
+/*
+        // each actor
+        for( auto local_it2 = actorHash.begin(i); local_it2 != actorHash.end(i); local_it2++ )
+        {
+            cout << endl << "actor: " << local_it2 -> first << endl;
+            // each movie actor did
+            for( unsigned int j = 0; j < local_it2 -> second.size(); j++ )
+            {
+                cout << local_it2 -> second[j] << endl;
+            }
+        }
+*/
+/////////////////////SAMPLE////////////
+   /* auto iter = actorHash.find("Stone, Emma");
+    if( iter != actorHash.end() )
+    {
+        cout << "purple" << endl;    
+        cout << iter -> second[0] << endl;
+    }
+    else
+        cout << "not here!!" << endl;
+ */   
+
+    cout << endl << "graph hash" << endl;
+    for( unsigned int i = 0; i < graphHash.bucket_count(); i++ )
+    {
+        for( auto local_it3 = graphHash.begin(i); local_it3 != graphHash.end(i); local_it3++ )
+        {
+            cout << endl << "actor: " << local_it3 -> first << endl;
+            cout << local_it3 -> second.DOS << " \"" << local_it3 -> second.parent << "\" " << local_it3 -> second.visited; 
         }
     }
 
