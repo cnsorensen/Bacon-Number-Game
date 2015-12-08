@@ -265,25 +265,19 @@ void BFS( string v )
         // set all the stuff to their stuff in the graph hash       
         auto w_i = actorHash.find( w_s );
 
-        cout << "Current: " << w_s << endl;
-
         // for each movie x that actor w is in
         for( unsigned int i = 0; i < w_i -> second.size(); i++ )
         {
             x_s = w_i -> second[i];
             auto x_i = movieHash.find( x_s );
 
-            cout << "For movie: " << x_s << endl;
-
             // for each actor y in movie x
             for( unsigned int j = 0; j < x_i -> second.size(); j++ )
             {
                 y_s = x_i -> second[j];
-                auto y_i = actorHash.find( y_s );
+                //auto y_i = actorHash.find( y_s );
                 auto currentVertex = graphHash.find( y_s );
                 
-                cout << "For actor: " << y_s << endl;
-    
                 if( currentVertex -> second.visited != true )
                 {
                     auto parentVertex = graphHash.find( w_s );
@@ -292,7 +286,6 @@ void BFS( string v )
                     currentVertex -> second.DOS = parentVertex -> second.DOS + 1;
                     currentVertex -> second.parentMovie = x_s;
                     q.push( y_s );
-                    cout << "New: " << y_s << endl;
                 }
             }
         }
@@ -319,7 +312,7 @@ void BFS( string v )
     else
         cout << "not here!!" << endl;
  */   
-
+/*
     cout << endl << "graph hash" << endl;
     for( unsigned int i = 0; i < graphHash.bucket_count(); i++ )
     {
@@ -329,7 +322,7 @@ void BFS( string v )
             cout << local_it3 -> second.DOS << " \"" << local_it3 -> second.parent << "\" " << local_it3 -> second.visited; 
         }
     }
-
+*/
     return;
 }
 
