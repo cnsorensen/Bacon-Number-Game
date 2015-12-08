@@ -1,5 +1,29 @@
 /*Bacon_Number*/
 
+/*
+ * CSC 300 Data Structures - Fall 2015
+ * Prog #4 - Graph Problems
+ * Six Degrees of Kevin Bacon
+ * Dr. John Weiss
+ * December 7, 2015
+ *
+ * Author: Chrissy Sorensen
+ *
+ * Compile: g++ Bacon_Numper.cpp -std=c++11 -o Bacon_Number
+ *
+ * Usage: ./Bacon_Number <movie_file.txt> ["Alt Actor"]
+ *
+ * This program calculates the Kevin Bacon number for any actor. It reads in a text
+ * file containing a formatted set of records containing movies followed by a list
+ * of actors in those movies. The interface prompts the user to type an actor's
+ * name and the program returns the Bacon Number followed by the chain of movies
+ * and actors connecting the actor to Kevin Bacon.
+ *
+ * This program also accepts another "Kevin Bacon". It creates a graph centered
+ * around this actor and will determine its number for the other actors. 
+ *
+ */
+
 // includes
 #include <iostream>
 #include <stdlib.h>
@@ -22,6 +46,7 @@ void Read_File( string );
 void Bacon_Number( string, string );
 void BFS( string );
 void buildHistogram();
+void listMovies( string );
 
 // globals
 struct graphVertex
@@ -44,7 +69,11 @@ unordered_map<string, vector<string>> actorHash( sizeActorHash );
 unordered_map<string, graphVertex> graphHash( sizeActorHash );
 
 /*
- *
+ * main: Takes the name of the movie text file and optional alternative actor. It 
+ *      makes calls to read in the file, perform bfs, and create histogram and times
+ *      them all. It continously prompts the user for an actor and calls the
+ *      Bacon_Number function to print the bacon number and path. It returns when 
+ *      the user enters without typing in an actor's name.
  */
 int main( int argc, char** argv )
 {
@@ -52,7 +81,6 @@ int main( int argc, char** argv )
 
     if( argc < 2 || argc > 3 )
     {
-        //cout << "Usage: ./Bacon_Number [-h|l] movie_file.txt [alt start]" << endl;
         cout << "Usage: ./Bacon_Number movie_file.txt [alt-start actor]" << endl;
         exit(0);
     }
@@ -92,6 +120,7 @@ int main( int argc, char** argv )
 
 
     // list movies with Kevin Bacon
+    listMovies( bacon );
 
     // create graph
     cout << endl << "Building MST ... ";
@@ -102,7 +131,7 @@ int main( int argc, char** argv )
     auto diff2 = c4 - c3;
     cout << endl << "Time to build MST: " << diff2 * 1000.0 / CLOCKS_PER_SEC << " sec" << endl;
 
-    // build histogram here
+    // print longest-shortest and build histogram here
     auto c5 = clock();
     buildHistogram();
     auto c6 = clock();
@@ -132,7 +161,8 @@ int main( int argc, char** argv )
 }
 
 /*
- *
+ * Bacon number: Takes in the actor and bacon. It iterates through the graph
+ *      printing the the path between the actor and bacon.
  */
 void Bacon_Number( string bacon, string actor )
 {
@@ -166,7 +196,10 @@ void Bacon_Number( string bacon, string actor )
 }
 
 /*
- *
+ * Read_File: Takes in a file name, opens it, and reads in the movies followed by the
+ *      actors of that movie. It pushes the movies into a hash table and lists the
+ *      actors in that hash table. It also pushes the actors into its own hash table
+ *      and keeps a list of the movies that actor is in.
  */
 void Read_File( string fileName )
 {
@@ -287,63 +320,12 @@ void Read_File( string fileName )
 
     fin.close();
 
-/////////////////////
-/*
-    cout << endl << "movies" << endl;
-    for( vector<string>::const_iterator i = movieList.begin(); i != movieList.end(); i++ )
-        cout << *i << endl;
-
-    cout << endl << "actors" << endl;
-    for( vector<string>::const_iterator i = actorList.begin(); i != actorList.end(); i++ )
-        cout << *i << endl;
-
-    cout << endl << "movieHash" << endl;
-    for( unsigned int i = 0; i < movieHash.bucket_count(); i++ )
-    {
-        for( auto local_it = movieHash.begin(i); local_it != movieHash.end(i); local_it++ )
-        {
-            cout << endl << "movie: " << local_it -> first << endl;
-            for( unsigned int j = 0; j < local_it -> second.size(); j++ )
-            {
-                cout << local_it -> second[j] << endl;
-            }
-        }
-    }
-*/
-/*
-    cout << endl << "actorHash" << endl;
-    // each item in actorHash
-    for( unsigned int i = 0; i < actorHash.bucket_count(); i++ )
-    {
-        // each actor
-        for( auto local_it2 = actorHash.begin(i); local_it2 != actorHash.end(i); local_it2++ )
-        {
-            cout << endl << "actor: " << local_it2 -> first << endl;
-            // each movie actor did
-            for( unsigned int j = 0; j < local_it2 -> second.size(); j++ )
-            {
-                cout << local_it2 -> second[j] << endl;
-            }
-        }
-    }
-*/
-/*
-    cout << endl << "graph hash" << endl;
-    for( unsigned int i = 0; i < graphHash.bucket_count(); i++ )
-    {
-        for( auto local_it3 = graphHash.begin(i); local_it3 != graphHash.end(i); local_it3++ )
-        {
-            cout << endl << "actor: " << local_it3 -> first << endl;
-            cout << local_it3 -> second.DOS << " " << local_it3 -> second.parent << " " << local_it3 -> second.visited; 
-        }
-    }
-*/
-
     return;
 }
 
 /*
- *
+ * BFS: Performs a breadth first search on the graph finding the shortest path 
+ *      between the Bacon actor and every other actor
  */
 void BFS( string v )
 {
@@ -391,45 +373,14 @@ void BFS( string v )
             }
         }
     }
-/*
-        // each actor
-        for( auto local_it2 = actorHash.begin(i); local_it2 != actorHash.end(i); local_it2++ )
-        {
-            cout << endl << "actor: " << local_it2 -> first << endl;
-            // each movie actor did
-            for( unsigned int j = 0; j < local_it2 -> second.size(); j++ )
-            {
-                cout << local_it2 -> second[j] << endl;
-            }
-        }
-*/
-/////////////////////SAMPLE////////////
-   /* auto iter = actorHash.find("Stone, Emma");
-    if( iter != actorHash.end() )
-    {
-        cout << "purple" << endl;    
-        cout << iter -> second[0] << endl;
-    }
-    else
-        cout << "not here!!" << endl;
- */   
-/*
-    cout << endl << "graph hash" << endl;
-    for( unsigned int i = 0; i < graphHash.bucket_count(); i++ )
-    {
-        for( auto local_it3 = graphHash.begin(i); local_it3 != graphHash.end(i); local_it3++ )
-        {
-            cout << endl << "actor: " << local_it3 -> first << endl;
-            cout << local_it3 -> second.DOS << " \"" << local_it3 -> second.parent << "\" " << local_it3 -> second.visited; 
-        }
-    }
-*/
 
     return;
 }
 
 /*
- *
+ * buildHistogram: This creates a histogram that gets printed to the console. It
+ *      goes through the graph and counts the number of actors that have the same
+ *      path length. It prints the values to the screen.
  */
 void buildHistogram()
 {
@@ -443,7 +394,6 @@ void buildHistogram()
         histogram[ it -> second.DOS ]++;        
     }
 
-
     // print histogram
     // print the value for bacon
     cout << endl << 0 << "  " << 1 << endl;
@@ -453,7 +403,9 @@ void buildHistogram()
     {
         // only print if there is an occurance of that dos
         if( histogram[j] != 0 )
+        {
             cout << j << "  " << histogram[j] << endl;
+        }   
     }
 
     // print the ones that have no bacon number
@@ -469,6 +421,25 @@ void buildHistogram()
     }
 
     cout << endl << "Avg path length : " << num / div  << endl;
+
+    return;
+}
+
+/*
+ * listMovies: Takes in an actors name and prints out all the movies the actor is in
+ */
+void listMovies( string actor )
+{
+    // access the actor
+    auto it = actorHash.find( actor );
+
+    cout << endl << it -> second.size() << " " << actor << " movies:" << endl;
+    
+    // print out each movie
+    for( unsigned int i = 0; i < it -> second.size(); i++ )
+    {
+        cout << it -> second[i] << endl;
+    }
 
     return;
 }
