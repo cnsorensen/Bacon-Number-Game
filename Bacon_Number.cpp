@@ -47,6 +47,7 @@ void Bacon_Number( string, string );
 void BFS( string );
 void buildHistogram();
 void listMovies( string );
+void lsEndpoints();
 
 // globals
 struct graphVertex
@@ -62,6 +63,7 @@ int numMovies = 0;
 int numActors = 0;
 int sizeMovieHash = 285000;
 int sizeActorHash = 285000;
+int maxDist = 0;
 
 // hash tables
 unordered_map<string, vector<string>> movieHash( sizeMovieHash );
@@ -131,13 +133,16 @@ int main( int argc, char** argv )
     auto diff2 = c4 - c3;
     cout << endl << "Time to build MST: " << diff2 * 1000.0 / CLOCKS_PER_SEC << " sec" << endl;
 
-    // print longest-shortest and build histogram here
+    // build and print histogram
     auto c5 = clock();
     buildHistogram();
+    
+    // print longest-shortest endpoints
+    lsEndpoints();
+
     auto c6 = clock();
     auto diff3 = c6 - c5;
     cout << endl << "Time to calculate longest-shortest paths: " << diff3 * 1000.0 / CLOCKS_PER_SEC << " sec" << endl;
-
 
     // continue finding bacon numbers as long as actors are being accepted
     string actor;
@@ -384,6 +389,8 @@ void BFS( string v )
  */
 void buildHistogram()
 {
+    cout << "Histogram:" << endl;
+
     // holds the dos and the number of actors with that dos
     // initalized to 20, almost never greater than 10
     int histogram[20] = {0};
@@ -405,6 +412,7 @@ void buildHistogram()
         if( histogram[j] != 0 )
         {
             cout << j << "  " << histogram[j] << endl;
+            maxDist = j;
         }   
     }
 
@@ -439,6 +447,22 @@ void listMovies( string actor )
     for( unsigned int i = 0; i < it -> second.size(); i++ )
     {
         cout << it -> second[i] << endl;
+    }
+
+    return;
+}
+
+/*
+ * lsEndpoints: Prints the longest-shortest endpoints of Bacon
+ */
+void lsEndpoints()
+{
+    cout << endl << "Longest-shortest endpoints: " << endl;
+
+    for( auto it = graphHash.begin(); it != graphHash.end(); it++ )
+    {
+        if( it -> second.DOS == maxDist )
+            cout << it -> first << endl;
     }
 
     return;
