@@ -19,15 +19,16 @@ typedef std::unordered_map<std::string,std::string> stringmap;
 
 // function prototypes
 void Read_File( string );
-void Bacon_Number( string );
+void Bacon_Number( string, string );
 void BFS( string );
+void buildHistogram();
 
 // globals
 struct graphVertex
 {
     int DOS = 0;
-    string parent = "orphan";
-    string parentMovie = "The Orphan";
+    string parent = "";
+    string parentMovie = "";
     bool visited = false;
 };
 
@@ -42,9 +43,12 @@ unordered_map<string, vector<string>> movieHash( sizeMovieHash );
 unordered_map<string, vector<string>> actorHash( sizeActorHash ); 
 unordered_map<string, graphVertex> graphHash( sizeActorHash );
 
+/*
+ *
+ */
 int main( int argc, char** argv )
 {
-    string actor = "Bacon, Kevin";
+    string bacon = "Bacon, Kevin";
 
     if( argc < 2 || argc > 3 )
     {
@@ -57,15 +61,14 @@ int main( int argc, char** argv )
 
     if( argc == 3 )
     {
-        actor = argv[2];   
-        cout << actor << endl;
-        ///Check to see if actor is valie
+        bacon = argv[2];   
+        cout << "Alternative " << bacon << endl;
     }
 
     // start timer
     auto c1 = clock();
     
-// read in movie file
+    // read in movie file
     Read_File( fileName );
 
     cout << "Reading movies: " << numMovies << " and " << numActors << " actors in database" << endl;
@@ -77,39 +80,67 @@ int main( int argc, char** argv )
     // print timer stats
     cout << "Time to read data and build graph: " << diff1 * 1000.0 / CLOCKS_PER_SEC << " sec" << endl;    
 
+    // check to see if alternative actor is included
+    if( argc == 3 )
+    {
+        if( actorHash.find( bacon ) == actorHash.end() )
+        {
+            cout << "Could not find performer named [" << bacon << "]" << endl;
+            exit( 0 );
+        }
+    }
+
+
     // list movies with Kevin Bacon
 
     // create graph
-    cout << "Building MST ... ";
+    cout << endl << "Building MST ... ";
     auto c3 = clock();
-    BFS( actor );
+    BFS( bacon );
     auto c4 = clock();
     cout << "done!" << endl;
     auto diff2 = c4 - c3;
-    cout << "Time to build MST: " << diff2 * 1000.0 / CLOCKS_PER_SEC << " sec" << endl;
+    cout << endl << "Time to build MST: " << diff2 * 1000.0 / CLOCKS_PER_SEC << " sec" << endl;
 
-    //
+    // build histogram here
+    auto c5 = clock();
+    buildHistogram();
+    auto c6 = clock();
+    auto diff3 = c6 - c5;
+    cout << endl << "Time to calculate longest-shortest paths: " << diff3 * 1000.0 / CLOCKS_PER_SEC << " sec" << endl;
 
-    //while( true )
-    //{
-    //  getline( cin,
-//    Bacon_Number( actor );
-    
 
-    //}
-
+    string actor;
+    while( true )
+    {
+        cout << "Enter the name of an actor <Last, First> \"\" to exit: ";
+        getline( cin, actor );
+        if( actor.size() == 0 )
+        {
+            cout << "consumate" << endl;
+            exit( 0 );
+        }
+        Bacon_Number( bacon, actor );
+        cout << "Porn freak" << endl;
+    }
 
 
     return 1;
 }
 
-void Bacon_Number( string actor )
+/*
+ *
+ */
+void Bacon_Number( string bacon, string actor )
 {
     cout << actor << endl;
 
     return;
 }
 
+/*
+ *
+ */
 void Read_File( string fileName )
 {
     vector<string> lines;
@@ -186,11 +217,11 @@ void Read_File( string fileName )
                         
                         // insert actor into graph
                         graphHash.emplace( currentActor, graphVertex() );
+                        numActors++;
                     }
 
                     // add movie to the corresponding actor
                     actorHash[currentActor].push_back( currentMovie );
-                    numActors++;
                 }
             }
             else
@@ -215,11 +246,13 @@ void Read_File( string fileName )
             
                     // insert into graph
                     graphHash.emplace( currentActor, graphVertex() );
+                    
+                    numActors++;
                 }
                 
                 // add current movie to the actor
                 actorHash[currentActor].push_back( currentMovie );
-                numActors++;
+
                 break;
             }
         }
@@ -282,6 +315,9 @@ void Read_File( string fileName )
     return;
 }
 
+/*
+ *
+ */
 void BFS( string v )
 {
     string x_s;   //movie
@@ -361,6 +397,51 @@ void BFS( string v )
         }
     }
 */
+
     return;
 }
 
+/*
+ *
+ */
+void buildHistogram()
+{
+    // holds the dos and the number of actors with that dos
+    // initalized to 20, almost never greater than 10
+    int histogram[20] = {0};
+
+    // find values for each distance
+    for( auto it = graphHash.begin(); it != graphHash.end(); it++ )
+    {
+        histogram[ it -> second.DOS ]++;        
+    }
+
+
+    // print histogram
+    // print the value for bacon
+    cout << endl << 0 << "  " << 1 << endl;
+
+    // go through the rest of the values
+    for( int j = 1; j < 20; j++ )
+    {
+        // only print if there is an occurance of that dos
+        if( histogram[j] != 0 )
+            cout << j << "  " << histogram[j] << endl;
+    }
+
+    // print the ones that have no bacon number
+    cout << "Inf" << "  " << histogram[0] - 1 << endl;
+
+    // compute the average bacon number
+    float div = 0.0;
+    float num = 0.0;
+    for( int i = 1; i < 20; i++ )
+    {
+        div += histogram[i];
+        num += i * histogram[i];
+    }
+
+    cout << endl << "Avg path length : " << num / div  << endl;
+
+    return;
+}
