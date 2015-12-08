@@ -10,6 +10,7 @@
 #include <vector>
 #include <fstream>
 #include <queue>
+#include <ctime>
 
 using namespace std;
 
@@ -17,7 +18,7 @@ using namespace std;
 typedef std::unordered_map<std::string,std::string> stringmap;
 
 // function prototypes
-void Read_File( string, stringmap, stringmap, stringmap );
+void Read_File( string );
 void Bacon_Number( string );
 void BFS( string );
 
@@ -30,38 +31,74 @@ struct graphVertex
     bool visited = false;
 };
 
+// variables
+int numMovies = 0;
+int numActors = 0;
+int sizeMovieHash = 285000;
+int sizeActorHash = 285000;
+
 // hash tables
-unordered_map<string, vector<string>> movieHash;
-unordered_map<string, vector<string>> actorHash; 
-unordered_map<string, graphVertex> graphHash;
+unordered_map<string, vector<string>> movieHash( sizeMovieHash );
+unordered_map<string, vector<string>> actorHash( sizeActorHash ); 
+unordered_map<string, graphVertex> graphHash( sizeActorHash );
 
 int main( int argc, char** argv )
 {
     string actor = "Bacon, Kevin";
 
-    if( argc < 2 || argc > 4 )
+    if( argc < 2 || argc > 3 )
     {
-        cout << "Usage: ./Bacon_Number [-h|l] movie_file.txt [alt start]" << endl;
+        //cout << "Usage: ./Bacon_Number [-h|l] movie_file.txt [alt start]" << endl;
+        cout << "Usage: ./Bacon_Number movie_file.txt [alt-start actor]" << endl;
         exit(0);
     }
 
     string fileName = argv[1];
 
-    if( argc > 2 )
+    if( argc == 3 )
     {
-        actor = argv[argc-1];   
+        actor = argv[2];   
         cout << actor << endl;
-    
+        ///Check to see if actor is valie
     }
 
-    stringmap movies;
-    stringmap actors;
-    stringmap verticies;
+    // start timer
+    auto c1 = clock();
+    
+// read in movie file
+    Read_File( fileName );
 
-    Read_File( fileName, movies, actors, verticies );
-    BFS( "Nord, Scot" );
+    cout << "Reading movies: " << numMovies << " and " << numActors << " actors in database" << endl;
  
+    // end timer
+    auto c2 = clock();
+    auto diff1 = c2 - c1;
+
+    // print timer stats
+    cout << "Time to read data and build graph: " << diff1 * 1000.0 / CLOCKS_PER_SEC << " sec" << endl;    
+
+    // list movies with Kevin Bacon
+
+    // create graph
+    cout << "Building MST ... ";
+    auto c3 = clock();
+    BFS( actor );
+    auto c4 = clock();
+    cout << "done!" << endl;
+    auto diff2 = c4 - c3;
+    cout << "Time to build MST: " << diff2 * 1000.0 / CLOCKS_PER_SEC << " sec" << endl;
+
+    //
+
+    //while( true )
+    //{
+    //  getline( cin,
 //    Bacon_Number( actor );
+    
+
+    //}
+
+
 
     return 1;
 }
@@ -73,10 +110,8 @@ void Bacon_Number( string actor )
     return;
 }
 
-void Read_File( string fileName, stringmap movies, stringmap actors, stringmap verticies )
+void Read_File( string fileName )
 {
-    cout << fileName << endl;
-
     vector<string> lines;
     vector<string> movieList;
     vector<string> actorList;
@@ -127,7 +162,8 @@ void Read_File( string fileName, stringmap movies, stringmap actors, stringmap v
 
                     // create an element in the movie hash table for current movie
                     movieHash.emplace( currentMovie, vector<string>() );
-                    
+                    numMovies++;
+
                     // toggle the flag to count item as actors now
                     flag = 1;
                 }
@@ -154,6 +190,7 @@ void Read_File( string fileName, stringmap movies, stringmap actors, stringmap v
 
                     // add movie to the corresponding actor
                     actorHash[currentActor].push_back( currentMovie );
+                    numActors++;
                 }
             }
             else
@@ -182,6 +219,7 @@ void Read_File( string fileName, stringmap movies, stringmap actors, stringmap v
                 
                 // add current movie to the actor
                 actorHash[currentActor].push_back( currentMovie );
+                numActors++;
                 break;
             }
         }
