@@ -110,20 +110,23 @@ int main( int argc, char** argv )
     cout << endl << "Time to calculate longest-shortest paths: " << diff3 * 1000.0 / CLOCKS_PER_SEC << " sec" << endl;
 
 
+    // continue finding bacon numbers as long as actors are being accepted
     string actor;
     while( true )
     {
+        // recieve the user input
         cout << "Enter the name of an actor <Last, First> \"\" to exit: ";
         getline( cin, actor );
+        
+        // exit program when user presses enter with no text
         if( actor.size() == 0 )
         {
-            cout << "consumate" << endl;
             exit( 0 );
         }
-        Bacon_Number( bacon, actor );
-        cout << "Porn freak" << endl;
-    }
 
+        // retrieve the bacon number
+        Bacon_Number( bacon, actor );
+    }
 
     return 1;
 }
@@ -133,7 +136,31 @@ int main( int argc, char** argv )
  */
 void Bacon_Number( string bacon, string actor )
 {
-    cout << actor << endl;
+    auto a_i = actorHash.find( actor );
+
+    // check for actor
+    if( a_i  == actorHash.end() )
+    {
+        cout << "Could not find performer named [" << actor << "]" << endl;
+        return;
+    }
+
+    auto g_i = graphHash.find( actor );
+
+    // print bacon number
+    cout << g_i -> second.DOS << ": ";
+    
+    while( a_i -> first != bacon )
+    {
+        cout << a_i -> first << " => ";
+        cout << g_i -> second.parentMovie << " => ";
+    
+        a_i = actorHash.find( g_i -> second.parent );
+        g_i = graphHash.find( g_i -> second.parent );
+    }
+    
+    // print bacon
+    cout << a_i -> first << endl;
 
     return;
 }
